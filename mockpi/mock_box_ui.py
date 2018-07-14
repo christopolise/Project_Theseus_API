@@ -11,8 +11,8 @@ from flask_apscheduler import APScheduler
 
 from game.constants import I2C
 from game.logic import Logic
-from i2c import SMBus
-from mockpi.qt_graphics import Ui_MainWindow
+from Project_Theseus_API.i2c import SMBus
+from Project_Theseus_API.mockpi.qt_graphics import Ui_MainWindow
 
 log = logging.getLogger(__name__)
 

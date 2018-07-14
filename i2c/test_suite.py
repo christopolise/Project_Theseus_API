@@ -6,11 +6,11 @@ from typing import List
 
 from smbus2 import SMBus
 
-from i2c.laser_i2c import LaserControl
-from i2c.lid_kit import ArduinoI2C, COLOR
-from i2c.lock_i2c import BoxLock
-from i2c.sevenseg import SevenSeg
-from i2c.switches_i2c import SwitchesI2C
+from Project_Theseus_API.i2c.laser_i2c import LaserControl
+from Project_Theseus_API.i2c.lid_kit import ArduinoI2C, COLOR
+from Project_Theseus_API.i2c.lock_i2c import BoxLock
+from Project_Theseus_API.i2c.sevenseg import SevenSeg
+from Project_Theseus_API.i2c.switches_i2c import SwitchesI2C
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

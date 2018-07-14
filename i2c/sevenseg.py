@@ -4,7 +4,7 @@ from typing import List
 
 from smbus2 import SMBus
 
-from i2c.i2c_module import I2CModule
+from Project_Theseus_API.i2c.i2c_module import I2CModule
 
 logger = logging.getLogger(__name__)
 

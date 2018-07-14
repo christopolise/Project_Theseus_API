@@ -1,9 +1,9 @@
 from typing import List
 
-from i2c.i2c_module import I2CModule
-from i2c.laser_i2c import LaserControl
-from i2c.receptors_i2c import ReceptorControl
-from i2c.sevenseg import SevenSeg
+from Project_Theseus_API.i2c.i2c_module import I2CModule
+from Project_Theseus_API.i2c.laser_i2c import LaserControl
+from Project_Theseus_API.i2c.receptors_i2c import ReceptorControl
+from Project_Theseus_API.i2c.sevenseg import SevenSeg
 
 
 class MockReceptorControl(ReceptorControl):
