@@ -1,8 +1,8 @@
-#PROJECT THESEUS API
+# PROJECT THESEUS API
 
 *A BYU Linux Club Project in Conjunction with UTOS*
 
-##Contributors
+## Contributors
 
 *For more information and hints regarding Project Theseus, feel free to contact one of us via email:*
 
@@ -11,7 +11,7 @@
 * [Scheridan Vorwaller](mailto:s.vorwaller@gmail.com)
 * [Chris Kitras](mailto:cmkitras@gmail.com)
 
-##Links
+## Links
 
 *Helpful links to get you started on contributing to the Project Theseus API*
 
