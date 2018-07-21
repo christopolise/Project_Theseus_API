@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
+from enum import IntEnum
 from multiprocessing import Manager, Process
 from typing import List
 import logging
-
-from game.constants import I2C
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -20,43 +19,43 @@ class MockBus(object):
         self.bus = bus
         self.messages = shared_dict
 
-    def read_byte(self, address: I2C) -> int:
+    def read_byte(self, address: IntEnum) -> int:
         result = self.messages.get(address, 0)
-        logging.debug("DEVICE: {} Value: {}".format(address, result))
+        logging.debug("DEVICE: {} Value: {}".format(address.name, result))
         return result
 
-    def write_byte(self, address: I2C, byte: int):
-        logging.debug("DEVICE: {} Value: {}".format(address, byte))
+    def write_byte(self, address: IntEnum, byte: int):
+        logging.debug("DEVICE: {} Value: {}".format(address.name, byte))
         self.messages[address] = byte
 
-    def read_byte_data(self, address: I2C, register: int) -> int:
+    def read_byte_data(self, address: IntEnum, register: int) -> int:
         """Read a single word from a designated register."""
         self._create_reg_if_not_exists(address)
         if isinstance(self.messages[address], int):
             result = self.messages[address]
         else:
             result = self.messages[address][register]
-        logging.debug("DEVICE: {} Register: {} Value: {}".format(address, register, result))
+        logging.debug("DEVICE: {} Register: {} Value: {}".format(address.name, register, result))
         return result
 
-    def write_byte_data(self, address: I2C, register: int, value: int):
+    def write_byte_data(self, address: IntEnum, register: int, value: int):
         """Write a single byte to a designated register."""
-        logging.debug("DEVICE: {} Register: {} Value: {}".format(address, register, value))
+        logging.debug("DEVICE: {} Register: {} Value: {}".format(address.name, register, value))
         self._create_reg_if_not_exists(address)
         self.messages[address][register] = value
 
-    def read_i2c_block_data(self, address: I2C, start_register: int, buffer: int) -> bytearray:
+    def read_i2c_block_data(self, address: IntEnum, start_register: int, buffer: int) -> bytearray:
         self._create_reg_if_not_exists(address)
         result = bytearray(self.messages[address][start_register: start_register + buffer])
-        logging.debug("DEVICE: {} Register: {} Value: {}".format(address, start_register, result))
+        logging.debug("DEVICE: {} Register: {} Value: {}".format(address.name, start_register, result))
         return result
 
-    def write_i2c_block_data(self, address: I2C, start_register: int, data: List[ord]):
-        logging.debug("DEVICE: {} Register: {} Value: {}".format(address, start_register, data))
+    def write_i2c_block_data(self, address: IntEnum, start_register: int, data: List[ord]):
+        logging.debug("DEVICE: {} Register: {} Value: {}".format(address.name, start_register, data))
         data = manager.list([0] * start_register).extend(data)
         self.messages[address] = data
 
-    def _create_reg_if_not_exists(self, address: I2C):
+    def _create_reg_if_not_exists(self, address: IntEnum):
         if self.messages.get(address, None) is None:
             self.messages[address] = manager.list(bytearray(self.REGISTERS))
 
