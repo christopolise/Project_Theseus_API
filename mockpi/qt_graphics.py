@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file 'qt_graphics.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtWidgets
-
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -31,8 +30,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.frame)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.lcdMinutes = QtWidgets.QLCDNumber(self.frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lcdMinutes.sizePolicy().hasHeightForWidth())
@@ -58,8 +56,7 @@ class Ui_MainWindow(object):
         self.Colon.setObjectName("Colon")
         self.horizontalLayout_6.addWidget(self.Colon)
         self.lcdSeconds = QtWidgets.QLCDNumber(self.frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lcdSeconds.sizePolicy().hasHeightForWidth())
@@ -115,8 +112,7 @@ class Ui_MainWindow(object):
         self.keypad = QtWidgets.QGridLayout(self.gridFrame)
         self.keypad.setObjectName("keypad")
         self.pushButton4 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton4.sizePolicy().hasHeightForWidth())
@@ -124,8 +120,7 @@ class Ui_MainWindow(object):
         self.pushButton4.setObjectName("pushButton4")
         self.keypad.addWidget(self.pushButton4, 1, 0, 1, 1)
         self.pushButton7 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton7.sizePolicy().hasHeightForWidth())
@@ -133,8 +128,7 @@ class Ui_MainWindow(object):
         self.pushButton7.setObjectName("pushButton7")
         self.keypad.addWidget(self.pushButton7, 1, 3, 1, 1)
         self.pushButton0 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton0.sizePolicy().hasHeightForWidth())
@@ -142,8 +136,7 @@ class Ui_MainWindow(object):
         self.pushButton0.setObjectName("pushButton0")
         self.keypad.addWidget(self.pushButton0, 0, 0, 1, 1)
         self.pushButton6 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton6.sizePolicy().hasHeightForWidth())
@@ -151,8 +144,7 @@ class Ui_MainWindow(object):
         self.pushButton6.setObjectName("pushButton6")
         self.keypad.addWidget(self.pushButton6, 1, 2, 1, 1)
         self.pushButton8 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton8.sizePolicy().hasHeightForWidth())
@@ -160,8 +152,7 @@ class Ui_MainWindow(object):
         self.pushButton8.setObjectName("pushButton8")
         self.keypad.addWidget(self.pushButton8, 2, 0, 1, 1)
         self.pushButton2 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton2.sizePolicy().hasHeightForWidth())
@@ -169,8 +160,7 @@ class Ui_MainWindow(object):
         self.pushButton2.setObjectName("pushButton2")
         self.keypad.addWidget(self.pushButton2, 0, 2, 1, 1)
         self.pushButton3 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton3.sizePolicy().hasHeightForWidth())
@@ -178,8 +168,7 @@ class Ui_MainWindow(object):
         self.pushButton3.setObjectName("pushButton3")
         self.keypad.addWidget(self.pushButton3, 0, 3, 1, 1)
         self.pushButton9 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton9.sizePolicy().hasHeightForWidth())
@@ -187,8 +176,7 @@ class Ui_MainWindow(object):
         self.pushButton9.setObjectName("pushButton9")
         self.keypad.addWidget(self.pushButton9, 2, 1, 1, 1)
         self.pushButtona = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButtona.sizePolicy().hasHeightForWidth())
@@ -196,8 +184,7 @@ class Ui_MainWindow(object):
         self.pushButtona.setObjectName("pushButtona")
         self.keypad.addWidget(self.pushButtona, 2, 2, 1, 1)
         self.pushButtonb = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButtonb.sizePolicy().hasHeightForWidth())
@@ -205,8 +192,7 @@ class Ui_MainWindow(object):
         self.pushButtonb.setObjectName("pushButtonb")
         self.keypad.addWidget(self.pushButtonb, 2, 3, 1, 1)
         self.pushButton1 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton1.sizePolicy().hasHeightForWidth())
@@ -214,8 +200,7 @@ class Ui_MainWindow(object):
         self.pushButton1.setObjectName("pushButton1")
         self.keypad.addWidget(self.pushButton1, 0, 1, 1, 1)
         self.pushButton5 = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton5.sizePolicy().hasHeightForWidth())
@@ -223,8 +208,7 @@ class Ui_MainWindow(object):
         self.pushButton5.setObjectName("pushButton5")
         self.keypad.addWidget(self.pushButton5, 1, 1, 1, 1)
         self.pushButtonc = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButtonc.sizePolicy().hasHeightForWidth())
@@ -232,8 +216,7 @@ class Ui_MainWindow(object):
         self.pushButtonc.setObjectName("pushButtonc")
         self.keypad.addWidget(self.pushButtonc, 3, 0, 1, 1)
         self.pushButtond = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButtond.sizePolicy().hasHeightForWidth())
@@ -241,8 +224,7 @@ class Ui_MainWindow(object):
         self.pushButtond.setObjectName("pushButtond")
         self.keypad.addWidget(self.pushButtond, 3, 1, 1, 1)
         self.pushButtone = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButtone.sizePolicy().hasHeightForWidth())
@@ -250,8 +232,7 @@ class Ui_MainWindow(object):
         self.pushButtone.setObjectName("pushButtone")
         self.keypad.addWidget(self.pushButtone, 3, 2, 1, 1)
         self.pushButtonf = QtWidgets.QPushButton(self.gridFrame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButtonf.sizePolicy().hasHeightForWidth())
@@ -592,3 +573,4 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "Inner Box Puzzle"))
         self.label_4.setText(_translate("MainWindow", "Tripwires"))
         self.start_reset.setText(_translate("MainWindow", "Start/Reset"))
+

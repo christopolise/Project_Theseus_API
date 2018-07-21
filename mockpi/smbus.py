@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 from multiprocessing import Manager, Process
 from typing import List
+import logging
+
+from game.constants import I2C
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 manager = Manager()
 shared_dict = manager.dict()
@@ -8,40 +14,49 @@ shared_dict = manager.dict()
 
 class MockBus(object):
     # The total number of registers
-    REGISTERS = 32
+    REGISTERS = 64
 
     def __init__(self, bus: int = None):
         self.bus = bus
         self.messages = shared_dict
 
-    def read_byte(self, address: hex) -> hex:
-        return self.messages.get(address, 0)
+    def read_byte(self, address: I2C) -> int:
+        result = self.messages.get(address, 0)
+        logging.debug("DEVICE: {} Value: {}".format(address, result))
+        return result
 
-    def write_byte(self, address: hex, byte: hex):
+    def write_byte(self, address: I2C, byte: int):
+        logging.debug("DEVICE: {} Value: {}".format(address, byte))
         self.messages[address] = byte
 
-    def read_byte_data(self, address: hex, register: int) -> hex:
+    def read_byte_data(self, address: I2C, register: int) -> int:
         """Read a single word from a designated register."""
         self._create_reg_if_not_exists(address)
         if isinstance(self.messages[address], int):
-            return self.messages[address]
+            result = self.messages[address]
         else:
-            return self.messages[address][register]
+            result = self.messages[address][register]
+        logging.debug("DEVICE: {} Register: {} Value: {}".format(address, register, result))
+        return result
 
-    def write_byte_data(self, address: hex, register: hex, value: hex):
+    def write_byte_data(self, address: I2C, register: int, value: int):
         """Write a single byte to a designated register."""
+        logging.debug("DEVICE: {} Register: {} Value: {}".format(address, register, value))
         self._create_reg_if_not_exists(address)
         self.messages[address][register] = value
 
-    def read_i2c_block_data(self, address: hex, start_register: hex, buffer: int) -> bytearray:
+    def read_i2c_block_data(self, address: I2C, start_register: int, buffer: int) -> bytearray:
         self._create_reg_if_not_exists(address)
-        return bytearray(self.messages[address][start_register: start_register + buffer])
+        result = bytearray(self.messages[address][start_register: start_register + buffer])
+        logging.debug("DEVICE: {} Register: {} Value: {}".format(address, start_register, result))
+        return result
 
-    def write_i2c_block_data(self, address: hex, start_register: hex, data: List[ord]):
+    def write_i2c_block_data(self, address: I2C, start_register: int, data: List[ord]):
+        logging.debug("DEVICE: {} Register: {} Value: {}".format(address, start_register, data))
         data = manager.list([0] * start_register).extend(data)
         self.messages[address] = data
 
-    def _create_reg_if_not_exists(self, address: hex):
+    def _create_reg_if_not_exists(self, address: I2C):
         if self.messages.get(address, None) is None:
             self.messages[address] = manager.list(bytearray(self.REGISTERS))
 
@@ -49,7 +64,7 @@ class MockBus(object):
 if __name__ == "__main__":
     from time import sleep
 
-    master = 0
+    master = 1
     length = 5
 
 
