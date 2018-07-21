@@ -3,7 +3,6 @@ from smbus2 import SMBus
 
 from Project_Theseus_API.i2c.i2c_module import I2CModule
 
-
 class SwitchesI2C(I2CModule):
     def __init__(self, bus, addr=0x3b):
         super().__init__(bus, addr)
@@ -15,6 +14,8 @@ class SwitchesI2C(I2CModule):
         return byte
 
     def read_switches(self):
+        if self.switches is None:
+            return []
         byte = bytes([self.switches])
         array = bitarray(endian='little')
         array.frombytes(byte)

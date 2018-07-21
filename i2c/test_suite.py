@@ -118,14 +118,15 @@ class TestSuite:
                 "".join(self.keypress) if not self.timer_running else "{}{:02}".format(self.minutes, self.seconds)), 16)
                 , self.dots)
             rgb = self.rgb
-            if not rgb[0] and not rgb[1]:
-                self.i2c_arduino.color = COLOR.BLANK
-            if not rgb[0] and rgb[1]:
-                self.i2c_arduino.color = COLOR.RED
-            if rgb[0] and not rgb[1]:
-                self.i2c_arduino.color = COLOR.BLUE
-            if rgb[0] and rgb[1]:
-                self.i2c_arduino.color = COLOR.GREEN
+            if rgb:
+                if not rgb[0] and not rgb[1]:
+                    self.i2c_arduino.color = COLOR.BLANK
+                if not rgb[0] and rgb[1]:
+                    self.i2c_arduino.color = COLOR.RED
+                if rgb[0] and not rgb[1]:
+                    self.i2c_arduino.color = COLOR.BLUE
+                if rgb[0] and rgb[1]:
+                    self.i2c_arduino.color = COLOR.GREEN
 
 
 if __name__ == "__main__":
