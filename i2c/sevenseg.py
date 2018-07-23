@@ -34,6 +34,7 @@ class SevenSeg(I2CModule):
         'e': 0x79,
         'f': 0x71
     }
+    inv_map = {v: k for k, v in CHARMAP.items()}
 
     def __init__(self, bus: SMBus, address: hex = 0x70, blink_rate: int = 0, brightness: hex = 0):
         """

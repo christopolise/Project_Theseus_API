@@ -3,14 +3,16 @@ import logging
 import sys
 from functools import partial
 from typing import Dict
-
+from time import sleep
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QCheckBox, QPushButton, QSlider
+from PyQt5.QtWidgets import QCheckBox, QPushButton, QSlider, QLCDNumber
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_apscheduler import APScheduler
+
+from Project_Theseus_API.i2c.sevenseg import SevenSeg
 from Project_Theseus_API.mockpi.smbus import MockBus as SMBus
+# TODO we shouldn't be importing anything from game, maybe some of this should be moved to a config file
 from game.constants import I2C
-from game.logic import Logic
 from Project_Theseus_API.mockpi.qt_graphics import Ui_MainWindow
 
 log = logging.getLogger(__name__)
@@ -19,7 +21,7 @@ log = logging.getLogger(__name__)
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(ApplicationWindow, self).__init__()
-        self.bus_num = Logic.bus_num
+        self.bus_num = 1
         self.bus = SMBus(self.bus_num)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -69,15 +71,15 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.scheduler = APScheduler(scheduler=BackgroundScheduler())
         self.scheduler.add_job("poll", self.poll_sensors, max_instances=2,
                                replace_existing=False)
-        # self.scheduler.start()
+        self.scheduler.start()
 
     def poll_sensors(self):
         for i in I2C:
-            word = self.bus.read_byte_data(i, 0)
-            if word is not None:
-                log.info("{}: {}".format(i.name, hex(word)))
-                if i is I2C.SEVENSEG:
-                    pass
+            word = self.bus.read_i2c_block_data(i, 0, 10)
+            if i is I2C.SEVENSEG:
+                self.ui.lcdMinutes.display("0x{}{}".format(SevenSeg.inv_map.get(word[0], 0), SevenSeg.inv_map.get(word[2], 0)))
+                self.ui.lcdSeconds.display("0x{}{}".format(SevenSeg.inv_map.get(word[6], 0), SevenSeg.inv_map.get(word[8], 0)))
+        sleep(2)
         self.scheduler.add_job("poll", self.poll_sensors, max_instances=2,
                                replace_existing=False)
 
