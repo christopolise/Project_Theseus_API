@@ -5,7 +5,7 @@ from typing import List
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 manager = Manager()
 shared_dict = manager.dict()
@@ -21,11 +21,11 @@ class MockBus(object):
 
     def read_byte(self, address: IntEnum) -> int:
         result = self.read_byte_data(address, 0)
-        logging.debug("Read Byte: DEVICE: {} Value: {}".format(address.name, result))
+        logger.debug("Read Byte: DEVICE: {} Value: {}".format(address.name, result))
         return result
 
     def write_byte(self, address: IntEnum, byte: int):
-        logging.debug("Write Byte: DEVICE: {} Value: {}".format(address.name, byte))
+        logger.debug("Write Byte: DEVICE: {} Value: {}".format(address.name, byte))
         self.write_byte_data(address, 0, byte)
 
     def read_byte_data(self, address: IntEnum, register: int) -> int:
@@ -35,24 +35,24 @@ class MockBus(object):
             result = self.messages[address]
         else:
             result = self.messages[address][register]
-        logging.debug("Read Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, result))
+        logger.debug("Read Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, result))
         return result
 
     def write_byte_data(self, address: IntEnum, register: int, value: int):
         """Write a single byte to a designated register."""
-        logging.debug("Write Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, value))
+        logger.debug("Write Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, value))
         self._create_reg_if_not_exists(address)
         self.messages[address][register] = value
 
     def read_i2c_block_data(self, address: IntEnum, start_register: int, buffer: int) -> bytearray:
         self._create_reg_if_not_exists(address)
         result = self.messages[address][start_register: start_register + buffer]
-        logging.debug("Read Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, result))
+        logger.debug("Read Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, result))
         return result
 
     def write_i2c_block_data(self, address: IntEnum, start_register: int, data: List[ord]):
         self._create_reg_if_not_exists(address)
-        logging.debug("Write Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, data))
+        logger.debug("Write Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, data))
         for i, d in enumerate(data):
             self.messages[address][start_register + i] = d
 

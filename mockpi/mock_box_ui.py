@@ -3,12 +3,11 @@ import logging
 import sys
 from functools import partial
 from typing import Dict
-from time import sleep
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QCheckBox, QPushButton, QSlider, QLCDNumber
+from PyQt5.QtWidgets import QCheckBox, QPushButton, QSlider, QLCDNumber, QRadioButton
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_apscheduler import APScheduler
-
+from time import sleep
 from Project_Theseus_API.i2c.sevenseg import SevenSeg
 from Project_Theseus_API.mockpi.smbus import MockBus as SMBus
 # TODO we shouldn't be importing anything from game, maybe some of this should be moved to a config file
@@ -16,6 +15,7 @@ from game.constants import I2C
 from Project_Theseus_API.mockpi.qt_graphics import Ui_MainWindow
 
 log = logging.getLogger(__name__)
+logging.basicConfig(level=logging.ERROR)
 
 
 class ApplicationWindow(QtWidgets.QMainWindow):
@@ -79,7 +79,30 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             if i is I2C.SEVENSEG:
                 self.ui.lcdMinutes.display("0x{}{}".format(SevenSeg.inv_map.get(word[0], 0), SevenSeg.inv_map.get(word[2], 0)))
                 self.ui.lcdSeconds.display("0x{}{}".format(SevenSeg.inv_map.get(word[6], 0), SevenSeg.inv_map.get(word[8], 0)))
-        sleep(2)
+            elif i is I2C.ARDUINO:
+                self.ui.RGB_red.setChecked(False)
+                self.ui.RGB_blue.setChecked(False)
+                self.ui.RGB_green.setChecked(False)
+                self.ui.RGB_red.setCheckable(bool(word[0]))
+                self.ui.RGB_blue.setCheckable(bool(word[0]))
+                self.ui.RGB_green.setCheckable(bool(word[0]))
+                if not word[0]:
+                    pass
+                elif word[0] < 20:
+                    self.ui.RGB_blue.setChecked(True)
+                elif word[0] < 200:
+                    self.ui.RGB_green.setChecked(True)
+                else:
+                    self.ui.RGB_red.setChecked(True)
+            elif i is I2C.SOLENOID:
+                if word[0] == 255:
+                    self.ui.solenoid.setChecked(True)
+                else:
+                    # TODO lock the solenoid after 10 seconds like the real one
+                    self.ui.solenoid.setChecked(False)
+
+        # sleep for a frame
+        sleep(1/60)
         self.scheduler.add_job("poll", self.poll_sensors, max_instances=2,
                                replace_existing=False)
 
