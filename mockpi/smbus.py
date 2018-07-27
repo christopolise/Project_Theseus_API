@@ -1,68 +1,105 @@
 #!/usr/bin/env python3
 from enum import IntEnum
-from multiprocessing import Manager, Process
-from typing import List
+from typing import List, Tuple
 import logging
+import zmq
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.ERROR)
+log = logging.getLogger(__name__)
 
-manager = Manager()
-shared_dict = manager.dict()
+PORT = 9998
 
 
 class MockBus(object):
+    context = zmq.Context()
     # The total number of registers
-    REGISTERS = 64
+
+    class Message:
+        def __init__(self, data, address: IntEnum, register: int = 0):
+            self.data = data
+            self.address = address
+            self.register = register
+
+        @staticmethod
+        def deserialize(data: str) -> Tuple[int, int, List[int]]:
+            result = data.split()
+            address = int(result.pop(0))
+            register = int(result.pop(0))
+            return address, register, [int(x) for x in result]
+
+        def __repr__(self):
+            return "{} {} {}".format(
+                self.address, self.register,
+                " ".join([str(x) for x in self.data]) if hasattr(self.data, "__iter__") else self.data
+            )
 
     def __init__(self, bus: int = None):
         self.bus = bus
-        self.messages = shared_dict
+        # Set up server for sending data
+        self.zmq_pub = self.context.socket(zmq.PUB)
+        # self.zmq_pub.bind("tcp://*:{}".format(PORT))
+
+        # Set up server for reading data
+        self.zmq_sub = self.context.socket(zmq.SUB)
+        self.zmq_sub.connect("tcp://localhost:{}".format(PORT))
+        self.buffer = dict()
 
     def read_byte(self, address: IntEnum) -> int:
-        result = self.read_byte_data(address, 0)
-        logger.debug("Read Byte: DEVICE: {} Value: {}".format(address.name, result))
-        return result
+        self.zmq_sub.setsockopt_string(zmq.SUBSCRIBE, str(address))
+        try:
+            _, register, value = self.zmq_sub.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
+            self.buffer["{} {}".format(address, register)] = value
+        except zmq.Again:
+            log.debug("No data waiting for {} on register {}".format(address, register))
+            return self.buffer.get("{} {}".format(address, register), 0)
+        self.zmq_sub.setsockopt_string(zmq.UNSUBSCRIBE, str(address))
+        log.debug("Read Byte: DEVICE: {} Register: {} Value: {}".format(address.name, register, value[0]))
+        return value[0]
 
     def write_byte(self, address: IntEnum, byte: int):
-        logger.debug("Write Byte: DEVICE: {} Value: {}".format(address.name, byte))
-        self.write_byte_data(address, 0, byte)
+        log.debug("Write Byte: DEVICE: {} Value: {}".format(address.name, byte))
+        self.zmq_pub.send_string(str(self.Message(byte, address=address)))
 
     def read_byte_data(self, address: IntEnum, register: int) -> int:
-        """Read a single word from a designated register."""
-        self._create_reg_if_not_exists(address)
-        if isinstance(self.messages[address], int):
-            result = self.messages[address]
-        else:
-            result = self.messages[address][register]
-        logger.debug("Read Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, result))
-        return result
+        self.zmq_sub.setsockopt_string(zmq.SUBSCRIBE, str(address) + " " + str(register))
+        try:
+            _, _, value = self.zmq_sub.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
+            self.buffer["{} {}".format(address, register)] = value
+        except zmq.Again:
+            log.debug("No data waiting for {} on register {}".format(address, register))
+            return self.buffer.get("{} {}".format(address, register), 0)
+        self.zmq_sub.setsockopt_string(zmq.UNSUBSCRIBE, str(address))
+        log.debug("Read Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, value[0]))
+        return value[0]
 
     def write_byte_data(self, address: IntEnum, register: int, value: int):
-        """Write a single byte to a designated register."""
-        logger.debug("Write Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, value))
-        self._create_reg_if_not_exists(address)
-        self.messages[address][register] = value
+        """Write a single word to a designated register."""
+        log.debug("Write Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, value))
+        self.zmq_pub.send_string(str(self.Message(value, address=address, register=register)))
 
     def read_i2c_block_data(self, address: IntEnum, start_register: int, buffer: int) -> bytearray:
-        self._create_reg_if_not_exists(address)
-        result = self.messages[address][start_register: start_register + buffer]
-        logger.debug("Read Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, result))
-        return result
+        self.zmq_sub.setsockopt_string(zmq.SUBSCRIBE, str(address) + " " + str(start_register))
+        try:
+            _, _, result = self.zmq_sub.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
+            self.buffer["{} {}".format(address, start_register)] = result
+        except zmq.Again:
+            log.debug("No data waiting for {} on register {}".format(address, start_register))
+            return self.buffer.get("{} {}".format(address, start_register), bytearray([0] * (start_register + buffer)))
+        self.zmq_sub.setsockopt_string(zmq.UNSUBSCRIBE, str(address))
+        while len(result) < start_register + buffer:
+            result.append(0)
+        log.debug("Read Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, result))
+        return bytearray(result)
 
     def write_i2c_block_data(self, address: IntEnum, start_register: int, data: List[ord]):
-        self._create_reg_if_not_exists(address)
-        logger.debug("Write Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, data))
-        for i, d in enumerate(data):
-            self.messages[address][start_register + i] = d
-
-    def _create_reg_if_not_exists(self, address: IntEnum):
-        if self.messages.get(address, None) is None:
-            self.messages[address] = manager.list(bytearray(self.REGISTERS))
+        log.debug("Write Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, data))
+        self.zmq_pub.send_string(str(self.Message(data, address=address, register=start_register)))
 
 
 if __name__ == "__main__":
+    from multiprocessing import Process
     from time import sleep
+
+    logging.basicConfig(level=logging.DEBUG)
 
     master = 1
     length = 5

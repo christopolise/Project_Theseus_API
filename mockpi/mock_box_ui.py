@@ -15,7 +15,6 @@ from game.constants import I2C
 from Project_Theseus_API.mockpi.qt_graphics import Ui_MainWindow
 
 log = logging.getLogger(__name__)
-logging.basicConfig(level=logging.ERROR)
 
 
 class ApplicationWindow(QtWidgets.QMainWindow):
