@@ -3,14 +3,15 @@ from enum import IntEnum
 from typing import List, Tuple
 import logging
 import zmq
-
 log = logging.getLogger(__name__)
 
-PORT = 9998
+CLIENT_PORT = 9998
+SERVER_PORT = 9999
 
 
+# http://learning-0mq-with-pyzmq.readthedocs.io/en/latest/pyzmq/devices/queue.html
 class MockBus(object):
-    context = zmq.Context()
+
     # The total number of registers
 
     class Message:
@@ -18,6 +19,7 @@ class MockBus(object):
             self.data = data
             self.address = address
             self.register = register
+            self.name = "{}_{}".format(address, register)
 
         @staticmethod
         def deserialize(data: str) -> Tuple[int, int, List[int]]:
@@ -27,64 +29,68 @@ class MockBus(object):
             return address, register, [int(x) for x in result]
 
         def __repr__(self):
-            return "{} {} {}".format(
+            return "{}_{} {}".format(
                 self.address, self.register,
                 " ".join([str(x) for x in self.data]) if hasattr(self.data, "__iter__") else self.data
             )
 
     def __init__(self, bus: int = None):
+        context = zmq.Context().instance()
         self.bus = bus
-        # Set up server for sending data
-        self.zmq_pub = self.context.socket(zmq.PUB)
-        # self.zmq_pub.bind("tcp://*:{}".format(PORT))
 
-        # Set up server for reading data
-        self.zmq_sub = self.context.socket(zmq.SUB)
-        self.zmq_sub.connect("tcp://localhost:{}".format(PORT))
+        # Set up client for reading data
+        self.zmq = context.socket(zmq.REQ)
+        self.zmq.connect("tcp://localhost:{}".format(CLIENT_PORT))
         self.buffer = dict()
 
     def read_byte(self, address: IntEnum) -> int:
-        self.zmq_sub.setsockopt_string(zmq.SUBSCRIBE, str(address))
+        register = 0
+        self.zmq.setsockopt_string(zmq.SUBSCRIBE, str(address.value) + "_0")
+        log.debug("Waiting for {}".format(str(address.value) + "_0"))
         try:
-            _, register, value = self.zmq_sub.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
-            self.buffer["{} {}".format(address, register)] = value
+            _, register, value = self.zmq.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
+            self.buffer["{}_{}".format(address, register)] = value
         except zmq.Again:
-            log.debug("No data waiting for {} on register {}".format(address, register))
-            return self.buffer.get("{} {}".format(address, register), 0)
-        self.zmq_sub.setsockopt_string(zmq.UNSUBSCRIBE, str(address))
+            log.debug("No data waiting for {} on register {}".format(address.name, register))
+            return self.buffer.get("{}_{}".format(address, register), 0)
+        self.zmq.setsockopt_string(zmq.UNSUBSCRIBE, str(address) + "_0")
         log.debug("Read Byte: DEVICE: {} Register: {} Value: {}".format(address.name, register, value[0]))
         return value[0]
 
     def write_byte(self, address: IntEnum, byte: int):
-        log.debug("Write Byte: DEVICE: {} Value: {}".format(address.name, byte))
-        self.zmq_pub.send_string(str(self.Message(byte, address=address)))
+        msg = self.Message(byte, address=address)
+        log.debug("Write Byte: DEVICE: {} Value: {}".format(address.name, str(msg)))
+        self.zmq.send_string(str(msg))
+        self.zmq.recv_string()
 
     def read_byte_data(self, address: IntEnum, register: int) -> int:
-        self.zmq_sub.setsockopt_string(zmq.SUBSCRIBE, str(address) + " " + str(register))
+        self.zmq.setsockopt_string(zmq.SUBSCRIBE, str(address) + "_" + str(register))
         try:
-            _, _, value = self.zmq_sub.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
-            self.buffer["{} {}".format(address, register)] = value
+            _, _, value = self.zmq.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
+            self.buffer["{}_{}".format(address, register)] = value
         except zmq.Again:
-            log.debug("No data waiting for {} on register {}".format(address, register))
-            return self.buffer.get("{} {}".format(address, register), 0)
-        self.zmq_sub.setsockopt_string(zmq.UNSUBSCRIBE, str(address))
+            log.debug("No data waiting for {} on register {}".format(address.name, register))
+            return self.buffer.get("{}_{}".format(address, register), 0)
+        self.zmq.setsockopt_string(zmq.UNSUBSCRIBE, str(address))
         log.debug("Read Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, value[0]))
         return value[0]
 
     def write_byte_data(self, address: IntEnum, register: int, value: int):
         """Write a single word to a designated register."""
         log.debug("Write Byte Data: DEVICE: {} Register: {} Value: {}".format(address.name, register, value))
-        self.zmq_pub.send_string(str(self.Message(value, address=address, register=register)))
+        self.zmq.send_string(str(self.Message(value, address=address, register=register)))
+        # TODO buffer the received message
+        self.zmq.recv_string()
 
     def read_i2c_block_data(self, address: IntEnum, start_register: int, buffer: int) -> bytearray:
-        self.zmq_sub.setsockopt_string(zmq.SUBSCRIBE, str(address) + " " + str(start_register))
+        self.zmq.subscribe(str(address) + "_" + str(start_register))
         try:
-            _, _, result = self.zmq_sub.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
-            self.buffer["{} {}".format(address, start_register)] = result
+            _, _, result = self.zmq.recv_serialized(self.Message.deserialize, flags=zmq.NOBLOCK)
+            self.buffer["{}_{}".format(address, start_register)] = result
         except zmq.Again:
-            log.debug("No data waiting for {} on register {}".format(address, start_register))
-            return self.buffer.get("{} {}".format(address, start_register), bytearray([0] * (start_register + buffer)))
-        self.zmq_sub.setsockopt_string(zmq.UNSUBSCRIBE, str(address))
+            log.debug("No data waiting for {} on register {}".format(address.name, start_register))
+            return self.buffer.get("{}_{}".format(address, start_register), bytearray([0] * (start_register + buffer)))
+        self.zmq.setsockopt_string(zmq.UNSUBSCRIBE, str(address))
         while len(result) < start_register + buffer:
             result.append(0)
         log.debug("Read Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, result))
@@ -92,7 +98,8 @@ class MockBus(object):
 
     def write_i2c_block_data(self, address: IntEnum, start_register: int, data: List[ord]):
         log.debug("Write Block Data: DEVICE: {} Register: {} Value: {}".format(address.name, start_register, data))
-        self.zmq_pub.send_string(str(self.Message(data, address=address, register=start_register)))
+        self.zmq.send_string(str(self.Message(data, address=address, register=start_register)))
+        self.zmq.recv_string()
 
 
 if __name__ == "__main__":

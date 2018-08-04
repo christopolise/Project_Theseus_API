@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import logging
 import sys
 from functools import partial
@@ -9,7 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask_apscheduler import APScheduler
 from time import sleep
 from Project_Theseus_API.i2c.sevenseg import SevenSeg
-from Project_Theseus_API.mockpi.smbus import MockBus as SMBus
+from Project_Theseus_API.mockpi.smbus import MockBus as SMBus, CLIENT_PORT, SERVER_PORT
 # TODO we shouldn't be importing anything from game, maybe some of this should be moved to a config file
 from game.constants import I2C
 from Project_Theseus_API.mockpi.qt_graphics import Ui_MainWindow
@@ -76,8 +77,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         for i in I2C:
             word = self.bus.read_i2c_block_data(i, 0, 10)
             if i is I2C.SEVENSEG:
-                self.ui.lcdMinutes.display("0x{}{}".format(SevenSeg.inv_map.get(word[0], 0), SevenSeg.inv_map.get(word[2], 0)))
-                self.ui.lcdSeconds.display("0x{}{}".format(SevenSeg.inv_map.get(word[6], 0), SevenSeg.inv_map.get(word[8], 0)))
+                self.ui.lcdMinutes.display(
+                    "0x{}{}".format(SevenSeg.inv_map.get(word[0], 0), SevenSeg.inv_map.get(word[2], 0)))
+                self.ui.lcdSeconds.display(
+                    "0x{}{}".format(SevenSeg.inv_map.get(word[6], 0), SevenSeg.inv_map.get(word[8], 0)))
             elif i is I2C.ARDUINO:
                 self.ui.RGB_red.setChecked(False)
                 self.ui.RGB_blue.setChecked(False)
@@ -104,6 +107,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         sleep(1/60)
         self.scheduler.add_job("poll", self.poll_sensors, max_instances=2,
                                replace_existing=False)
+
 
     @property
     def time(self) -> str:
@@ -211,5 +215,43 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+    from multiprocessing import Process
+    import zmq
+
+    def zmq_device():
+        try:
+            context = zmq.Context(1)
+            # Socket facing clients
+            frontend = context.socket(zmq.XREP)
+            frontend.bind("tcp://*:{}".format(CLIENT_PORT))
+            # Socket facing services
+            backend = context.socket(zmq.XREQ)
+            backend.bind("tcp://*:{}".format(SERVER_PORT))
+
+            zmq.device(zmq.QUEUE, frontend, backend)
+        except Exception as e:
+            print(e)
+            print("bringing down zmq device")
+        finally:
+            pass
+            frontend.close()
+            backend.close()
+            context.term()
+
+    def zmq_server():
+
+        context = zmq.Context()
+        socket = context.socket(zmq.REP)
+        socket.connect("tcp://localhost:%s" % SERVER_PORT)
+        while True:
+            message = socket.recv()
+            # Acknowledge receipt
+            socket.send(message)
+            # TODO Forward message to the rest of the clients
+            sleep(1/60)
+
+    Process(target=zmq_device).start()
+    Process(target=zmq_server).start()
+
     logging.basicConfig(level=logging.DEBUG)
     ApplicationWindow.run()
