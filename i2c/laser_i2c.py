@@ -28,6 +28,15 @@ class LaserControl(I2CModule):
         self._state.frombytes(byte.to_bytes(1, byteorder='little'))
         self._update()
 
+    @state.setter
+    def state(self, number: int):
+        # You passed an integer, write that integer to the lasers
+        i = 0
+        # Iterate through binary but skip 0b at beginning
+        for c in bin(int(number) % (2**self.LASER_COUNT))[2:].zfill(self.LASER_COUNT):
+            self[i] = (c == '1')
+            i += 1
+
     def _update(self):
         buf = bitarray(self._state)
         buf.invert()
@@ -45,8 +54,8 @@ if __name__ == '__main__':
     master = SMBus(1)
     lasers = LaserControl(master)
     lasers[:] = False
-    option = int(argv[1])
-    if option == 0:
+    option = argv[1]
+    if option == "cycle":
         i = 0
         j = -1
         k = -2
@@ -60,7 +69,11 @@ if __name__ == '__main__':
             lasers[k] = False
 
             sleep(.1)
-    elif option == 1:
-        lasers[:] = True
     else:
-        print('Huh?')
+        try:
+            lasers.state = option
+            # If they passed a number, write it to the lasers
+            print("Binary Written: {}".format(bin(int(option))))
+
+        except ValueError:
+            print("{} is not a recognized argument. Please input either 'cycle', or a decimal number".format(option))
