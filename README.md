@@ -2,6 +2,12 @@
 
 *A BYU Linux Club Project in Conjunction with UTOS*
 
+## Installation
+To install necessary Pip Packages:
+```
+pip install -r requirements.txt
+```
+
 ## Contributors
 
 *For more information and hints regarding Project Theseus, feel free to contact one of us via email:*
