@@ -86,7 +86,8 @@ if __name__ == '__main__':
     master = SMBus(1)
     read = ReceptorControl(master)
     while True:
-        print(read.read_raw())
-        print(read.read_int())
+        print("Raw Data:  {}".format(read.read_raw()))
+        print("Integer:   {}".format(read.read_int()))
+        print("Bit Array: {}".format(read.read()))
         print(''.join(['1' if x else '0' for x in read[:]]))
         sleep(1)
